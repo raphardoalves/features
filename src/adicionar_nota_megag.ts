@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path';
+import { join } from 'path';
 import { conn } from './conn/conn';
 import { parseStringPromise } from 'xml2js';
-
 
 async function transferir(filePath: string) {
     const xmlData = fs.readFileSync(filePath, 'utf-8');
@@ -51,7 +51,7 @@ async function transferir(filePath: string) {
     return
 }
 
-const xml_pasta = 'C:\\Users\\rapha\\OneDrive\\Desktop\\DAIA DESK\\NF-E'
+const xml_pasta = join(process.cwd(), 'src', 'ambiente')
 async function main() {
     //aqui ele pegou somente os arquivos
     const files = fs.readdirSync(xml_pasta).filter(f => f.endsWith('.xml'));
