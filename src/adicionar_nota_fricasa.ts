@@ -3,7 +3,7 @@ import xlsx from 'xlsx'
 import { join } from 'path'
 import { conn } from './conn/conn';
 import path from 'path';
-
+//testando git
 const adicionar_nota_fricasa = async (caminho: string) => {
     const reponse = await fetch(caminho)
     const xml = await reponse.text()
