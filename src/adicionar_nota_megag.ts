@@ -12,15 +12,15 @@ async function transferir(filePath: string) {
     const numeroNota = nfe.ide.nNF;
     const tipo = nfe.ide.natOp;
     let peso = 0 
-    if(!['DEVOLUCAO', 'BONIFICACAO', 'BRINDE'].includes(tipo)) {
-        peso = nfe.transp.vol.pesoB 
+    if(nfe.transp.vol) {
+        peso = nfe.transp.vol.pesoB
     }
     const dataFaturado = nfe.ide.dhEmi.split('T')[0]; 
     const cnpjCliente = nfe.dest.CNPJ || nfe.dest.CPF;
     
     const [retorno]: any[] = await conn.execute(`SELECT leads.id FROM leads INNER JOIN prospects p ON prospect_id = p.id WHERE p.cnpj = ?`, [cnpjCliente])
     const id_lead = retorno[0]?.id || null
-    const [insert]: any[] = await conn.execute(`INSERT INTO pedido (numero_nota, leads_id, cnpj_cliente, tipo, data_faturado) VALUES (?,?,?,?,?)`, [numeroNota, id_lead, cnpjCliente, tipo, dataFaturado])
+    const [insert]: any[] = await conn.execute(`INSERT INTO pedido (numero_nota, leads_id, cnpj_cliente, tipo, data_faturado, cnpj_fornecedor) VALUES (?,?,?,?,?,'19043440000235')`, [numeroNota, id_lead, cnpjCliente, tipo, dataFaturado])
     const idPedido = insert.insertId
     
     const produtos = Array.isArray(nfe.det) ? nfe.det : [nfe.det];
@@ -51,7 +51,7 @@ async function transferir(filePath: string) {
     return
 }
 
-const xml_pasta = join(process.cwd(), 'src', 'ambiente')
+const xml_pasta = join(process.cwd(), 'src', 'ambiente', 'xml')
 async function main() {
     //aqui ele pegou somente os arquivos
     const files = fs.readdirSync(xml_pasta).filter(f => f.endsWith('.xml'));

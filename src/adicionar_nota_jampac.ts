@@ -1,9 +1,9 @@
-import { conn } from './conn/conn.js';
+import { conn } from './conn/conn';
 import { join } from 'path'
 import xlsx from "xlsx";
 
 const cadastrar_xlsx = async () => {
-    const caminho = join(process.cwd(), 'src', 'ambiente', 'arquivo.xlsx')
+    const caminho = join(process.cwd(), 'src', 'ambiente', 'jampac.xlsx')
   
     const workbook = xlsx.readFile(caminho);
 
@@ -16,6 +16,7 @@ const cadastrar_xlsx = async () => {
         throw new Error('Resultado Linha Undefined')
     }
     const dados: any[] = xlsx.utils.sheet_to_json(sheet);
+
     let referencia: any[] = []
     
     for(let i in dados) {
