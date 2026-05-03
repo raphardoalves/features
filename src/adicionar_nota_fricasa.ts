@@ -14,7 +14,7 @@ const adicionar_nota_fricasa = async (caminho: string) => {
     const tipo = nfe.ide.natOp.toUpperCase();
     const fornecedor = nfe.emit.CNPJ;
     let peso = 0;
-    if(!['DEVOLUCAO', 'BONIFICACAO', 'BRINDE'].includes(tipo)) {
+    if(nfe.transp.vol) {
         peso = nfe.transp.vol.pesoB 
     }
     const dataFaturado = nfe.ide.dhEmi.split('T')[0]; 
@@ -55,12 +55,12 @@ const adicionar_nota_fricasa = async (caminho: string) => {
     return
 }
 const main = async () => {
-    const caminho = join(process.cwd(), 'src', 'ambiente', 'lista_api.xlsx')
+    const caminho = join(process.cwd(), 'src', 'ambiente', 'fricasa.xlsx')
     const workbook = xlsx.readFile(caminho);
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[String(sheetName)];
     if(!sheet) {
-        return
+        return console.log('sem folha')
     }
     const dados: any[] = xlsx.utils.sheet_to_json(sheet); 
 
@@ -70,5 +70,4 @@ const main = async () => {
     }
     console.log('Notas Fricasa adicionada com Sucesso!')
 }
-
 main()
