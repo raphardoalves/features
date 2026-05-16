@@ -2,7 +2,7 @@ import { conn } from './conn/conn';
 import { join } from 'path'
 import xlsx from "xlsx";
 
-const cadastrar_xlsx = async () => {
+const adicionar_nota = async () => {
     const caminho = join(process.cwd(), 'src', 'ambiente', 'jampac.xlsx')
   
     const workbook = xlsx.readFile(caminho);
@@ -52,4 +52,6 @@ const cadastrar_xlsx = async () => {
 
 };
 
-cadastrar_xlsx();
+export default {
+    adicionar_nota
+}

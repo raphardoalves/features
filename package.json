@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node src/adicionar_nota_fricasa.ts"
+    "dev": "nodemon --exec ts-node src/execultar.ts"
   },
   "keywords": [],
   "author": "",

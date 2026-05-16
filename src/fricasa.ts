@@ -4,7 +4,7 @@ import { join } from 'path'
 import { conn } from './conn/conn';
 import path from 'path';
 //testando git
-const adicionar_nota_fricasa = async (caminho: string) => {
+const transferir = async (caminho: string) => {
     const reponse = await fetch(caminho)
     const xml = await reponse.text()
     const json = await parseStringPromise(xml, { explicitArray: false });
@@ -54,7 +54,7 @@ const adicionar_nota_fricasa = async (caminho: string) => {
     }
     return
 }
-const main = async () => {
+const adicionar_nota = async () => {
     const caminho = join(process.cwd(), 'src', 'ambiente', 'fricasa.xlsx')
     const workbook = xlsx.readFile(caminho);
     const sheetName = workbook.SheetNames[0];
@@ -65,9 +65,11 @@ const main = async () => {
     const dados: any[] = xlsx.utils.sheet_to_json(sheet); 
 
     for(const i in dados) {
-        await adicionar_nota_fricasa(dados[i].url) 
+        await transferir(dados[i].url) 
         console.log(`Processados: ${i}`)
     }
     console.log('Notas Fricasa adicionada com Sucesso!')
 }
-main()
+export default {
+    adicionar_nota
+}
