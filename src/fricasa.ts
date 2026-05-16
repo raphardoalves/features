@@ -1,7 +1,7 @@
 import { parseStringPromise } from 'xml2js'
 import xlsx from 'xlsx'
 import { join } from 'path'
-import { conn } from './conn/conn';
+import { conn_crm } from './conn/conn';
 import path from 'path';
 //testando git
 const transferir = async (caminho: string) => {
@@ -20,10 +20,10 @@ const transferir = async (caminho: string) => {
     const dataFaturado = nfe.ide.dhEmi.split('T')[0]; 
     const cnpjCliente = nfe.dest.CNPJ || nfe.dest.CPF;
 
-    const [retorno]: any[] = await conn.execute(`SELECT leads.id FROM leads INNER JOIN prospects p ON prospect_id = p.id WHERE p.cnpj = ?`, [cnpjCliente])
+    const [retorno]: any[] = await conn_crm.execute(`SELECT leads.id FROM leads INNER JOIN prospects p ON prospect_id = p.id WHERE p.cnpj = ?`, [cnpjCliente])
     const id_lead = retorno[0]?.id || null
 
-    const [insert]: any = await conn.execute(`INSERT INTO pedido (numero_nota, leads_id, cnpj_cliente, cnpj_fornecedor, tipo, data_faturado) VALUES (?,?,?,?,?,?)`, [numeroNota, id_lead, cnpjCliente, fornecedor, tipo, dataFaturado])
+    const [insert]: any = await conn_crm.execute(`INSERT INTO pedido (numero_nota, leads_id, cnpj_cliente, cnpj_fornecedor, tipo, data_faturado) VALUES (?,?,?,?,?,?)`, [numeroNota, id_lead, cnpjCliente, fornecedor, tipo, dataFaturado])
     const idPedido = insert.insertId
 
     const produtos = Array.isArray(nfe.det) ? nfe.det : [nfe.det]
@@ -35,7 +35,7 @@ const transferir = async (caminho: string) => {
     for (const item of produtos) {
         const prod = item.prod;
       
-        await conn.execute(
+        await conn_crm.execute(
             `INSERT INTO produtos_nota 
             (id_pedido, codigo_produto, nome_produto, quantidade, unidade_medida, valor_unidade, valor_total, peso)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -50,7 +50,7 @@ const transferir = async (caminho: string) => {
                 pesoPorItem 
             ]
         );
-        console.log('Inserindo Produtos')
+        console.log(`Inserindo Item: ${item}`)
     }
     return
 }

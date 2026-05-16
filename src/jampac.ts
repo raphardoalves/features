@@ -1,4 +1,4 @@
-import { conn } from './conn/conn';
+import { conn_crm } from './conn/conn';
 import { join } from 'path'
 import xlsx from "xlsx";
 
@@ -23,9 +23,9 @@ const adicionar_nota = async () => {
         const [dia, mes, ano] = dados[i].data_faturado.split('/')
         const data_mysql = `${ano}-${mes}-${dia}`;
         if(!referencia.includes(dados[i].numero_nota)) {
-            const [retorno]: any[] = await conn.execute(`SELECT leads.id FROM leads INNER JOIN prospects p ON prospect_id = p.id WHERE p.cnpj = ?`, [dados[i].cnpj_cliente])
+            const [retorno]: any[] = await conn_crm.execute(`SELECT leads.id FROM leads INNER JOIN prospects p ON prospect_id = p.id WHERE p.cnpj = ?`, [dados[i].cnpj_cliente])
             const id_lead = retorno[0]?.id || null
-            await conn.execute('INSERT INTO pedido (leads_id, numero_nota, cnpj_cliente, cnpj_fornecedor, tipo, data_faturado) VALUES (?, ?, ?, ?, ?, ?)', [id_lead, 
+            await conn_crm.execute('INSERT INTO pedido (leads_id, numero_nota, cnpj_cliente, cnpj_fornecedor, tipo, data_faturado) VALUES (?, ?, ?, ?, ?, ?)', [id_lead, 
                 dados[i].numero_nota,
                 dados[i].cnpj_cliente,
                 dados[i].cnpj_fornecedor,
@@ -36,7 +36,7 @@ const adicionar_nota = async () => {
         }
     }
     for(let i in dados) {
-        await conn.execute(`INSERT INTO produtos_nota (id_pedido, codigo_produto, nome_produto, quantidade, unidade_medida, valor_unidade, valor_total, peso) 
+        await conn_crm.execute(`INSERT INTO produtos_nota (id_pedido, codigo_produto, nome_produto, quantidade, unidade_medida, valor_unidade, valor_total, peso) 
             SELECT id, ?, ?, ?, ?, ?, ?, ? FROM pedido WHERE numero_nota = ?`, [dados[i].codigo_produto,
             dados[i].nome_produto,
             dados[i].quantidade,

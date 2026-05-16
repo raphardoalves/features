@@ -1,7 +1,8 @@
 import fs from 'fs'
 import path from 'path';
 import { join } from 'path';
-import { conn } from './conn/conn';
+import { conn_crm } from './conn/conn';
+import { conn_loja } from './conn/conn';
 import { parseStringPromise } from 'xml2js';
 import xlsx from "xlsx";
 
@@ -21,9 +22,9 @@ async function transferir(filePath: string) {
     const dataFaturado = nfe.ide.dhEmi.split('T')[0]; 
     const cnpjCliente = nfe.dest.CNPJ || nfe.dest.CPF;
     
-    const [retorno]: any[] = await conn.execute(`SELECT leads.id FROM leads INNER JOIN prospects p ON prospect_id = p.id WHERE p.cnpj = ?`, [cnpjCliente])
+    const [retorno]: any[] = await conn_crm.execute(`SELECT leads.id FROM leads INNER JOIN prospects p ON prospect_id = p.id WHERE p.cnpj = ?`, [cnpjCliente])
     const id_lead = retorno[0]?.id || null
-    const [insert]: any[] = await conn.execute(`INSERT INTO pedido (numero_nota, leads_id, cnpj_cliente, tipo, data_faturado, cnpj_fornecedor) VALUES (?,?,?,?,?,'19043440000235')`, [numeroNota, id_lead, cnpjCliente, tipo, dataFaturado])
+    const [insert]: any[] = await conn_crm.execute(`INSERT INTO pedido (numero_nota, leads_id, cnpj_cliente, tipo, data_faturado, cnpj_fornecedor) VALUES (?,?,?,?,?,'19043440000235')`, [numeroNota, id_lead, cnpjCliente, tipo, dataFaturado])
     const idPedido = insert.insertId
     
     const produtos = Array.isArray(nfe.det) ? nfe.det : [nfe.det];
@@ -35,7 +36,7 @@ async function transferir(filePath: string) {
     for (const item of produtos) {
         const prod = item.prod;
       
-        await conn.execute(
+        await conn_crm.execute(
             `INSERT INTO produtos_nota 
             (id_pedido, codigo_produto, nome_produto, quantidade, unidade_medida, valor_unidade, valor_total, peso)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -48,8 +49,9 @@ async function transferir(filePath: string) {
                 parseFloat(prod.vUnCom),
                 parseFloat(prod.qCom) * parseFloat(prod.vUnCom),
                 pesoPorItem
-            ]
-        );
+            ]   
+        )
+        console.log(`Inserindo ${item}`)
     }
     return
 }
@@ -78,12 +80,12 @@ const atualizar_tabela = async () => {
     const dados: any[] = xlsx.utils.sheet_to_json(sheet);
     
     for(let i in dados) {
-        const [incluso]: any[] = await conn.query(`SELECT codigo FROM produto WHERE codigo = ?`, [dados[i].codigo]) 
+        const [incluso]: any[] = await conn_loja.query(`SELECT codigo FROM produto WHERE codigo = ?`, [dados[i].codigo]) 
         const codigo = incluso[0] || false
         const [dia, mes, ano] = dados[i].validade.split('/')
         const data_mysql = `${ano}-${mes}-${dia}`;
         if(!codigo) {
-            await conn.execute('INSERT INTO produto (codigo, nome, valor, estoque, validade) VALUES (?,?,?,?,?)', [ 
+            await conn_loja.execute('INSERT INTO produto (codigo, nome, valor, estoque, validade) VALUES (?,?,?,?,?)', [ 
                 dados[i].codigo,
                 dados[i].nome,
                 dados[i].valor,
@@ -91,7 +93,7 @@ const atualizar_tabela = async () => {
                 data_mysql
             ])
         } else {
-            await conn.execute('UPDATE produto SET valor=?, estoque=?, validade=? WHERE codigo = ?', [dados[i].valor, dados[i].estoque, data_mysql, dados[i].codigo])
+            await conn_loja.execute('UPDATE produto SET valor=?, estoque=?, validade=? WHERE codigo = ?', [dados[i].valor, dados[i].estoque, data_mysql, dados[i].codigo])
         }
     }
     console.log('Tabela Atualizada Com Sucesso!!')
