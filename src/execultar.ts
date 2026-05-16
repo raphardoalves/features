@@ -2,8 +2,8 @@ import megag from "./megag";
 import fenix from "./fenix";
 import fricasa from "./fricasa";
 import jampac from "./jampac";
-
 import * as readline from "readline";
+
 const menu = `
 |*************************************************************|
 
