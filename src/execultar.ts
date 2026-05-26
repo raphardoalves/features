@@ -1,38 +1,38 @@
-import megag from "./megag";
-import fenix from "./fenix";
-import fricasa from "./fricasa";
-import jampac from "./jampac";
-import * as readline from "readline";
 
+import { menuMegag } from "./controller/megagController/megagController";
+import { menuFenix } from "./controller/fenixController/fenixController";
+import { menuFicasa } from "./controller/fricasaController/fricasaController";
+import { menuJampac } from "./controller/jampacController/jampacController";
+
+import ultius from "./services/ultius";
+
+export function main() {
 const menu = `
 |*************************************************************|
 
-    Qual Feature deseja execultar:
-    1 - Adicionar nota Fenix
-    2 - Adicionar nota Fricasa
-    3 - Adicionar nota Jampac
-    4 - Adicionar nota MegaG
-    5 - Adicionar Produto MegaG
+    Qual Fornecedor:
+    1 - Fenix
+    2 - Fricasa
+    3 - Jampac
+    4 - MegaG
 
 |*************************************************************|
 `
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
-
-rl.question(menu, (opcao) => {
-    const numero = Number(opcao);
-    switch(numero) {
-        case 1: fenix.adicionar_nota()
-            break
-        case 2: fricasa.adicionar_nota()
-            break
-        case 3: jampac.adicionar_nota()
-            break
-        case 4: megag.adicionar_nota()
-            break
-        case 5: megag.atualizar_tabela()
-            break
-        default:
-            console.log('Invalido')
-    }
-    rl.close()
-})
+    ultius.rl.question(menu, (opcao) => {
+        const numero = Number(opcao);
+        switch(numero) {
+            case 1: menuFenix()
+                break
+            case 2: menuFicasa()
+                break
+            case 3: menuJampac()
+                break
+            case 4: menuMegag()
+                break
+            default: 
+                ultius.rl.close()
+                console.log('Invalido')
+        }
+    })
+}
+main()

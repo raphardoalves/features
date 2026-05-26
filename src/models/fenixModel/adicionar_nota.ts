@@ -1,10 +1,12 @@
-import fenix from './services/fenix'
-import { conn_crm } from './conn/conn'
-import { arrayCliente } from './services/fenix'
-import { sleep } from './services/ultius'
+import fenix from '../../services/fenix'
+import { conn_crm } from '../../conn/conn'
+import { arrayCliente } from '../../services/fenix'
+import ultius from '../../services/ultius'
+import {join} from 'path'
 
-const adicionar_nota = async () => {
-    const textoBruto = await fenix.extrairTextoBruto()
+export const adicionar_nota = async () => {
+    const caminho = join(process.cwd(), 'src', 'ambiente', 'fenix.pdf')
+    const textoBruto = await ultius.extrairTextoBrutoPdf(caminho)
     const textoLimpo = fenix.limparTexto(textoBruto)
     const notas = fenix.extrairNotasFiscais(textoLimpo)
     for(let i in notas) {
@@ -60,14 +62,10 @@ const adicionar_nota = async () => {
                     item.totalProduto
                 ]
             )
-            await sleep(200)
+            await ultius.sleep(200)
             console.log(`Itens: ${item.nomeProduto}`)
         }
-        await sleep(1000)
+        await ultius.sleep(1000)
     }
     console.log('Nota Fenix Inserida com sucesso!!')
-}
-
-export default {
-    adicionar_nota
 }

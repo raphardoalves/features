@@ -1,8 +1,8 @@
 import { parseStringPromise } from 'xml2js'
 import xlsx from 'xlsx'
 import { join } from 'path'
-import { conn_crm } from './conn/conn';
-import path from 'path';
+import { conn_crm } from '../../conn/conn';
+
 //testando git
 const transferir = async (caminho: string) => {
     const reponse = await fetch(caminho)
@@ -54,7 +54,7 @@ const transferir = async (caminho: string) => {
     }
     return
 }
-const adicionar_nota = async () => {
+export const adicionar_nota = async () => {
     const caminho = join(process.cwd(), 'src', 'ambiente', 'fricasa.xlsx')
     const workbook = xlsx.readFile(caminho);
     const sheetName = workbook.SheetNames[0];
@@ -69,7 +69,4 @@ const adicionar_nota = async () => {
         console.log(`Processados: ${i}`)
     }
     console.log('Notas Fricasa adicionada com Sucesso!')
-}
-export default {
-    adicionar_nota
 }

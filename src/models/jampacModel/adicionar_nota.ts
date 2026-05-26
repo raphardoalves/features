@@ -1,11 +1,11 @@
-import { conn_crm } from './conn/conn';
+import { conn_crm } from "../../conn/conn";
 import { join } from 'path'
 import xlsx from "xlsx";
+import { get_cnpj } from "../../services/jampac";
 
-const adicionar_nota = async () => {
-    const data_cliente = get_cnpj()
-
+export const adicionar_nota = async () => {
     const caminho = join(process.cwd(), 'src', 'ambiente', 'jampac.xlsx')
+    const data_cliente = get_cnpj(caminho)
     const workbook = xlsx.readFile(caminho);
     const sheetName = workbook.SheetNames[0];
     if(!sheetName) {
@@ -50,24 +50,4 @@ const adicionar_nota = async () => {
         ])
     }
     console.log("Nota Fiscal Inserida No Banco de dados!!")
-};
-function get_cnpj() {
-    const caminho = join(process.cwd(), 'src', 'ambiente', 'jampac.xlsx')
-    const workbook = xlsx.readFile(caminho);
-    const sheetName = workbook.SheetNames[1]
-    if(!sheetName) {
-        throw new Error('Resultado Linha Undefined')
-    }
-    const sheet = workbook.Sheets[sheetName];
-    if(!sheet) {
-        throw new Error('Resultado Linha Undefined')
-    }
-    const dados: any[] = xlsx.utils.sheet_to_json(sheet);
-
-    return dados[0]
-}
-
-export default {
-    adicionar_nota,
-    get_cnpj
 }
