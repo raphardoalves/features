@@ -23,10 +23,11 @@ function limparTexto(texto: string): string {
     const texto6 = texto5.replace(/:\s*\d+\s+[A-ZÀ-Ú]+(?:\s+[A-ZÀ-Ú]+)*/g, "")
     return texto6
 }
-function extrairNotasFiscais(texto: string): NotaFiscal[] {
+function extrairNotasFiscais(texto: string) {
     const linhas = texto.split('\n')
     const regexNota = /^\s*(\d+)\s+(\d+)\s+(\d{2}\/\d{2}\/\d{4})\s+(\d+)\s+(.+?)\s+([\d\.]+,\d{2})\s+[\d\.]+,\d{4}\s+[\d\.]+,\d{2}\s+([\d\.]+,\d{2})/
     const regexProduto = /^\s*(\d{3,})\s+(.+)/
+    const regexDevolucao = /^\s*(\d{2}\/\d{2}\/\d{4})\s+(\d+)\s+(.+?)\s{2,}(\d+)\s+(\d+)\s+([\w.]+)\s+([\d.]+,\d{2})\s+([\d.]+,\d{2})\s+([\d.]+,\d{2})\s+([\d.]+,\d{2})\s+([\d.]+,\d{2})$/
     const notas: NotaFiscal[] = []
     let notaAtual: NotaFiscal | null = null
     for (const linha of linhas) {
@@ -86,10 +87,43 @@ function extrairNotasFiscais(texto: string): NotaFiscal[] {
             })
         }
     }
+    const devolucao = []
+    for (const linha of linhas) {
+        const match = linha.match(regexDevolucao)
+        if (!match) continue
+        const [
+            _,
+            data,
+            pedido,
+            cliente,
+            codigo,
+            loja,
+            vendedor,
+            valorPedido,
+            valorBase,
+            percentual,
+            percentualBase,
+            comissao
+        ] = match
+        devolucao.push({
+            data,
+            pedido: Number(pedido),
+            cliente: cliente?.replace(/\s+/g, ' ').trim(),
+            codigo: Number(codigo),
+            loja: Number(loja),
+            vendedor,
+            valorPedido: Number(valorPedido?.replace(/\./g, '').replace(',', '.')),
+            valorBase: Number(valorBase?.replace(/\./g, '').replace(',', '.')),
+            percentual: Number(percentual?.replace(/\./g, '').replace(',', '.')),
+            percentualBase: Number(percentualBase?.replace(/\./g, '').replace(',', '.')),
+            comissao: Number(comissao?.replace(/\./g, '').replace(',', '.'))
+        })
+    }
+
     if (notaAtual) {
         notas.push(notaAtual)
     }
-    return notas
+    return {notas, devolucao}
 }
 
 export const arrayCliente = {

@@ -8,8 +8,10 @@ export const adicionar_nota = async () => {
     const caminho = join(process.cwd(), 'src', 'ambiente', 'fenix.pdf')
     const textoBruto = await ultius.extrairTextoBrutoPdf(caminho)
     const textoLimpo = fenix.limparTexto(textoBruto)
-    const notas = fenix.extrairNotasFiscais(textoLimpo)
+    const relatorio = fenix.extrairNotasFiscais(textoLimpo)
+    const notas = relatorio.notas
     for(let i in notas) {
+    
         const codigo_string = String(notas[i]?.codigoCliente)
         const cnpj = arrayCliente[codigo_string as keyof typeof arrayCliente]
 
@@ -18,7 +20,7 @@ export const adicionar_nota = async () => {
 
         const [dia, mes, ano]: any = notas[i]?.dataFaturamento.split('/')
         const data_mysql = `${ano}-${mes}-${dia}`;
-
+        
         if (!numeroNota || !cnpj) continue
 
         const [retorno]: any = await conn_crm.execute(

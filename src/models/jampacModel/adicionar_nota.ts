@@ -30,7 +30,7 @@ export const adicionar_nota = async () => {
             await conn_crm.execute('INSERT INTO pedido (leads_id, numero_nota, cnpj_cliente, cnpj_fornecedor, tipo, data_faturado) VALUES (?, ?, ?, ?, ?, ?)', [id_lead, 
                 dados[i].numero_nota,
                 cnpj,
-                dados[i].cnpj_fornecedor,
+                '07235232000178',
                 dados[i].tipo,
                 data_mysql
             ])
