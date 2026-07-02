@@ -12,7 +12,6 @@ const transferir = async (caminho: string) => {
     const nfe = json.nfeProc.NFe.infNFe;
     const numeroNota = nfe.ide.nNF;
     const tipo = nfe.ide.natOp.toUpperCase();
-    const fornecedor = nfe.emit.CNPJ;
     let peso = 0;
     if(nfe.transp.vol) {
         peso = nfe.transp.vol.pesoB 
@@ -20,10 +19,11 @@ const transferir = async (caminho: string) => {
     const dataFaturado = nfe.ide.dhEmi.split('T')[0]; 
     const cnpjCliente = nfe.dest.CNPJ || nfe.dest.CPF;
 
-    const [retorno]: any[] = await conn_crm.execute(`SELECT leads.id FROM leads INNER JOIN prospects p ON prospect_id = p.id WHERE p.cnpj = ?`, [cnpjCliente])
+    const [retorno]: any[] = await conn_crm.execute(`SELECT leads.id, leads.representante_id FROM leads INNER JOIN prospects p ON prospect_id = p.id WHERE p.cnpj = ?`, [cnpjCliente])
     const id_lead = retorno[0]?.id || null
+    const id_representante = retorno[0]?.representante_id || null
 
-    const [insert]: any = await conn_crm.execute(`INSERT INTO pedido (numero_nota, leads_id, cnpj_cliente, cnpj_fornecedor, tipo, data_faturado) VALUES (?,?,?,?,?,?)`, [numeroNota, id_lead, cnpjCliente, fornecedor, tipo, dataFaturado])
+    const [insert]: any = await conn_crm.execute(`INSERT INTO pedido (numero_nota, leads_id, cnpj_cliente, cnpj_fornecedor, tipo, data_faturado, representante_id) VALUES (?,?,?,?,?,?,?)`, [numeroNota, id_lead, cnpjCliente, '83188110000237', tipo, dataFaturado, id_representante])
     const idPedido = insert.insertId
 
     const produtos = Array.isArray(nfe.det) ? nfe.det : [nfe.det]
