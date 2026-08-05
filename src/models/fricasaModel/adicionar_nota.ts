@@ -33,7 +33,7 @@ const transferir = async (caminho: string) => {
     const pesoPorItem = pesoTotal / quantidadeItens;
 
     for (const item of produtos) {
-        const prod = item.prod;
+        const prod = item.prod;2
       
         await conn_crm.execute(
             `INSERT INTO produtos_nota 
@@ -50,7 +50,7 @@ const transferir = async (caminho: string) => {
                 pesoPorItem 
             ]
         );
-        console.log(`Inserindo Item: ${item}`)
+        console.log(`Ultima nota: ${numeroNota}`)
     }
     return
 }
@@ -65,7 +65,15 @@ export const adicionar_nota = async () => {
     const dados: any[] = xlsx.utils.sheet_to_json(sheet); 
 
     for(const i in dados) {
-        await transferir(dados[i].url) 
+        try {
+            await transferir(`${dados[i].url}.xml`)
+        } catch (err: any) {
+            if(err.code === 'ER_DUP_ENTRY') {
+                console.log((`${dados[i].url}.xml`))
+                console.error('Nota fiscal ja existe no banco')
+                console.error(err.sqlMessage)
+            }
+        }
         console.log(`Processados: ${i}`)
     }
     console.log('Notas Fricasa adicionada com Sucesso!')

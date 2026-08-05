@@ -4,6 +4,7 @@ import xlsx from "xlsx";
 import { get_cnpj } from "../../services/jampac";
 
 export const adicionar_nota = async () => {
+
     const caminho = join(process.cwd(), 'src', 'ambiente', 'jampac.xlsx')
     const data_cliente = get_cnpj(caminho)
     const workbook = xlsx.readFile(caminho);
@@ -16,9 +17,8 @@ export const adicionar_nota = async () => {
         throw new Error('Resultado Linha Undefined')
     }
     const dados: any[] = xlsx.utils.sheet_to_json(sheet);
-
+     
     let referencia: any[] = []
-
     for(let i in dados) {
         const [dia, mes, ano] = dados[i].data_faturado.split('/')
         const data_mysql = `${ano}-${mes}-${dia}`;
